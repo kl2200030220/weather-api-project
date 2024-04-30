@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://source.unsplash.com/1920x1080/?weather');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 36px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* Navigation bar styles */
+        nav {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Form styles */
+        form {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #008CBA;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #005F6B;
+        }
+
+        /* Weather report styles */
+        .weather-report {
+            margin-top: 50px;
+            background-color: rgba(0, 0, 0, 0.5); /* Updated background color */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: left;
+        }
+
+        .weather-report h2 {
+            font-size: 24px;
+        }
+
+        .weather-report p {
+            margin-bottom: 5px;
+        }
+
+        /* Forecast display */
+        .forecast {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .forecast .day {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 0 5px;
+            text-align: center;
+        }
+
+        /* About and Content sections */
+        .about-content, .content, .weather-interface, .services-content {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            color: black; /* Changed font color */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation bar -->
+<nav>
+    <ul>
+        <li><a href="#" onclick="toggleSection('home')" style="color: #FFD700;"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="#" onclick="toggleSection('about')">About Us</a></li>
+        <li><a href="#" onclick="toggleSection('services')">Services</a></li>
+        <li><a href="#" onclick="toggleSection('weather')">Local Weather</a></li>
+        <li><a href="#" onclick="toggleSection('forecast')">5-Day Forecast</a></li>
+    </ul>
+</nav>
+
+<!-- Main content -->
+<div class="container">
+    <h1>Weather Forecast Application</h1>
+    <form method="post" id="weatherForm">
+        <input type="text" name="city" id="cityInput" placeholder="Enter city name" required>
+        <button type="submit">Get Forecast</button>
+        <button type="button" onclick="getLocation()">Use My Location</button>
+        {% csrf_token %}
+    </form>
+
+    <!-- Weather report section -->
+    <div class="weather-report" id="weatherReport">
+        <!-- Weather report content will be inserted here dynamically -->
+    </div>
+
+    <!-- Forecast display section -->
+    <div class="forecast" id="forecastDisplay">
+        <!-- Forecast content will be inserted here dynamically -->
+    </div>
+
+    <!-- About section -->
+    <div class="about-content" id="aboutContent">
+        <h2>About Us</h2>
+        <p>We are a team of weather enthusiasts dedicated to providing accurate and timely weather forecasts to users around the world. Our mission is to empower individuals and communities with the knowledge they need to make informed decisions about their daily activities and plans.</p>
+        <p>With years of experience in meteorology and data analysis, we strive to deliver reliable weather information through our Weather Forecast Application. Whether you're planning a weekend getaway or simply want to know if you'll need an umbrella tomorrow, we've got you covered!</p>
+    </div>
+
+    <!-- Services section -->
+    <div class="services-content" id="servicesContent">
+        <h2>Our Services</h2>
+        <p>At Weather Forecast Application, we offer a range of services to enhance your weather experience:</p>
+        <ul>
+            <li>Real-time weather updates for any location</li>
+            <li>Hourly and daily forecasts with detailed information</li>
+            <li>Customizable weather alerts for your preferred conditions</li>
+            <li>Interactive maps and radar for better visualization</li>
+        </ul>
+        <p>Our goal is to provide you with the tools and information you need to plan ahead and stay safe in any weather conditions. Explore our services and make the most of your weather experience!</p>
+    </div>
+
+    <!--
+
+ Content section -->
+    <div class="content" id="contentSection">
+        <h2>Local Weather</h2>
+        <p>Stay updated on the current weather conditions in your area. Simply enter your city name or allow location access to get real-time weather data.</p>
+        <p>Our weather report includes essential details such as temperature, humidity, wind speed, and atmospheric pressure. With accurate and reliable forecasts, you can plan your activities with confidence.</p>
+    </div>
+
+    <!-- Weather interface section -->
+    <div class="weather-interface" id="weatherInterface">
+        <!-- Main weather interface content will be inserted here dynamically -->
+    </div>
+</div>
+
+<!-- JavaScript to fetch weather data, get location, and toggle about/content sections -->
+<script>
+    document.getElementById('weatherForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var city = document.getElementById('cityInput').value;
+        getWeather(city);
+    });
+
+    function getWeather(city) {
+        // Fetch weather data for the specified city in India
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},IN&appid=ddf2684d32416e3a95a7dc12a4e73b5d`)
+            .then(response => response.json())
+            .then(data => {
+                displayWeather(data);
+            })
+            .catch(error => {
+                console.error('Error fetching weather data:', error);
+                displayError();
+            });
+    }
+
+    function displayWeather(data) {
+        const weatherReport = document.getElementById('weatherReport');
+        weatherReport.innerHTML = `
+            <h2>Current Weather in ${data.name}, ${data.sys.country}</h2>
+            <p>Description: ${data.weather[0].description}</p>
+            <p>Temperature: ${data.main.temp}°C</p>
+            <p>Feels like: ${data.main.feels_like}°C</p>
+            <p>Min Temperature: ${data.main.temp_min}°C</p>
+            <p>Max Temperature: ${data.main.temp_max}°C</p>
+            <p>Humidity: ${data.main.humidity}%</p>
+            <p>Wind Speed: ${data.wind.speed} m/s</p>
+            <p>Sunrise: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString()}</p>
+            <p>Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}</p>
+        `;
+    }
+
+    function displayError() {
+        const weatherReport = document.getElementById('weatherReport');
+        weatherReport.innerHTML = '<p>Failed to fetch weather data. Please try again.</p>';
+    }
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            console.error("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=ddf2684d32416e3a95a7dc12a4e73b5d`)
+            .then(response => response.json())
+            .then(data => {
+                displayWeather(data);
+            })
+            .catch(error => {
+                console.error('Error fetching weather data:', error);
+                displayError();
+            });
+    }
+
+    function toggleSection(section) {
+        var aboutContent = document.getElementById('aboutContent');
+        var servicesContent = document.getElementById('servicesContent');
+        var contentSection = document.getElementById('contentSection');
+        var weatherInterface = document.getElementById('weatherInterface');
+        var forecastDisplay = document.getElementById('forecastDisplay');
+
+        if (section === 'about') {
+            aboutContent.style.display = 'block';
+            servicesContent.style.display = 'none';
+            contentSection.style.display = 'none';
+            weatherInterface.style.display = 'none';
+            forecastDisplay.style.display = 'none';
+            scrollToSection('about');
+        } else if (section === 'services') {
+            aboutContent.style.display = 'none';
+            servicesContent.style.display = 'block';
+            contentSection.style.display = 'none';
+            weatherInterface.style.display = 'none';
+            forecastDisplay.style.display = 'none';
+            scrollToSection('services');
+        } else if (section === 'home') {
+            aboutContent.style.display = 'none';
+            servicesContent.style.display = 'none';
+            contentSection.style.display = 'none';
+            weatherInterface.style.display = 'block';
+            forecastDisplay.style.display = 'none';
+            getLocation(); // Fetch weather data for the main interface based on current location
+            scrollToSection('home');
+        } else if (section === 'weather') {
+            aboutContent.style.display = 'none';
+            servicesContent.style.display = 'none';
+            contentSection.style.display = 'none';
+            weatherInterface.style.display = 'block';
+            forecastDisplay.style.display = 'none';
+            getLocation(); // Fetch weather data based on current location
+            scrollToSection('weather');
+        } else if (section === 'forecast') {
+            aboutContent.style.display = 'none';
+            servicesContent.style.display = 'none';
+            contentSection.style.display = 'none';
+            weatherInterface.style.display = 'none';
+            forecastDisplay.style.display = 'block';
+            fetchForecast(); // Fetch 5-day forecast
+            scrollToSection('forecast');
+        }
+    }
+
+    function scrollToSection(sectionId) {
+        var section = document.getElementById(sectionId);
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function fetchForecast() {
+        // Placeholder data until integrated with real API
+        const forecastData = [
+            { day: "Wednesday", min_temp: 35, max_temp: 45, description: "Sunny" },
+            { day: "Thursday", min_temp: 40, max_temp: 42, description: "Partly sunny" },
+            { day: "Friday", min_temp: 39, max_temp: 40, description: "Partly sunny" },
+            { day: "Saturday", min_temp: 37, max_temp: 47, description: "Sunny" },
+            { day: "Sunday", min_temp: 38, max_temp: 48, description: "Sunny" }
+        ];
+
+        const forecastDisplay = document.getElementById('forecastDisplay');
+        forecastDisplay.innerHTML = '<h2>5-Day Forecast</h2>';
+
+        forecastData.forEach(forecast => {
+            const forecastHtml = `
+                <div class="day">
+                    <h3>${forecast.day}</h3>
+                    <p>${forecast.min_temp}°C - ${forecast.max_temp}°C</p>
+                    <p>${forecast.description}</p>
+                </div>
+            `;
+            forecastDisplay.insertAdjacentHTML('beforeend', forecastHtml);
+        });
+    }
+</script>
+
+</body>
+</html>

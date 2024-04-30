@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #ff69b4, #1e90ff, #2ecc71, #8a2be2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container, .success-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .login-form input[type="text"],
+    .login-form input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .login-form input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #2874a6;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .login-form input[type="submit"]:hover {
+      background-color: #1b4f75;
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .signup-link a {
+      color: #2874a6;
+    }
+
+    .login-form input[type="email"] {
+      width: calc(100% - 22px); /* Adjusting width */
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .error-message {
+      color: red;
+    }
+
+    .success-message {
+      display: none;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form class="login-form" id="loginForm" onsubmit="login(event)">
+      <input type="text" name="usernameOrEmail" id="usernameOrEmail" placeholder="Username or Email" required autocomplete="username">
+      <input type="password" name="password" id="password" placeholder="Password" required autocomplete="current-password">
+      <input type="checkbox" name="savePassword" id="savePassword">
+      <label for="savePassword">Save Password</label>
+      <input type="submit" value="Login">
+      <div class="error-message" id="errorMessage"></div>
+      <div class="success-message" id="loginSuccessMessage">Login Successful!</div>
+    </form>
+    <div class="signup-link">
+      Don't have an account? <a href="#" onclick="showSignupForm()">Sign Up</a>
+    </div>
+    <div class="signup-link">
+      <a href="#" onclick="showForgottenPasswordForm()">Forgotten Password?</a>
+    </div>
+  </div>
+
+  <div class="login-container" id="signupContainer" style="display: none;">
+    <h2>Sign Up</h2>
+    <form class="login-form" id="signupForm" onsubmit="signup(event)">
+      <input type="text" name="newUsername" id="newUsername" placeholder="Username" required>
+      <input type="email" name="newEmail" id="newEmail" placeholder="Email" required>
+      <input type="password" name="newPassword" id="newPassword" placeholder="Password" required>
+      <input type="submit" value="Sign Up">
+    </form>
+    <div class="signup-link">
+      Already have an account? <a href="#" onclick="showLoginForm()">Login</a>
+    </div>
+  </div>
+
+  <div class="login-container" id="forgottenPasswordContainer" style="display: none;">
+    <h2>Forgotten Password</h2>
+    <form class="login-form" id="forgottenPasswordForm" onsubmit="retrievePassword(event)">
+      <input type="text" name="forgottenUsernameOrEmail" id="forgottenUsernameOrEmail" placeholder="Username or Email" required>
+      <input type="submit" value="Retrieve Password">
+    </form>
+    <div class="signup-link">
+      <a href="#" onclick="showLoginForm()">Back to Login</a>
+    </div>
+  </div>
+
+  <div class="success-container" style="display:none">
+    <h2>Login Successful!</h2>
+    <p>Congratulations, you have successfully logged in!</p>
+  </div>
+
+  <script>
+    var users = JSON.parse(localStorage.getItem('users')) || [];
+    var loginSuccessMessage = document.getElementById("loginSuccessMessage");
+    var successContainer = document.querySelector('.success-container');
+    var errorMessage = document.getElementById('errorMessage');
+
+    function showSignupForm() {
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("signupContainer").style.display = "block";
+      errorMessage.innerHTML = '';
+    }
+
+    function showLoginForm() {
+      document.getElementById("loginForm").style.display = "block";
+      document.getElementById("signupContainer").style.display = "none";
+      document.getElementById("forgottenPasswordContainer").style.display = "none";
+      errorMessage.innerHTML = '';
+    }
+
+    function showForgottenPasswordForm() {
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("forgottenPasswordContainer").style.display = "block";
+      errorMessage.innerHTML = '';
+    }
+
+    function login(event) {
+      event.preventDefault();
+      var usernameOrEmail = document.getElementById("usernameOrEmail").value;
+      var password = document.getElementById("password").value;
+
+      // Check if user exists
+      var user = users.find(function(user) {
+        return (user.username === usernameOrEmail || user.email === usernameOrEmail) && user.password === password;
+      });
+
+      if (user) {
+        var savePassword = document.getElementById("savePassword").checked;
+        if (savePassword) {
+          localStorage.setItem('savedPassword', password);
+        } else {
+          localStorage.removeItem('savedPassword');
+        }
+        loginSuccessMessage.style.display = "block";
+        setTimeout(() => {
+          successContainer.style.display = 'block';
+        }, 2000); // Show success message after 2 seconds
+      } else {
+        errorMessage.innerHTML = 'Invalid username, email, or password.';
+      }
+    }
+
+    function signup(event) {
+      event.preventDefault();
+      var newUsername = document.getElementById("newUsername").value;
+      var newEmail = document.getElementById("newEmail").value;
+      var newPassword = document.getElementById("newPassword").value;
+
+      // Store new user
+      users.push({
+        username: newUsername,
+        email: newEmail,
+        password: newPassword
+      });
+
+      localStorage.setItem('users', JSON.stringify(users));
+
+      alert("Sign Up Successful! Please login.");
+      showLoginForm();
+    }
+
+    function retrievePassword(event) {
+      event.preventDefault();
+      var forgottenUsernameOrEmail = document.getElementById("forgottenUsernameOrEmail").value;
+
+      // Find user by username or email
+      var user = users.find(function(user) {
+        return user.username === forgottenUsernameOrEmail || user.email === forgottenUsernameOrEmail;
+      });
+
+      if (user) {
+        // You can implement your password retrieval logic here, for example:
+        alert("Your password has been sent to your email.");
+        showLoginForm();
+      } else {
+        errorMessage.innerHTML = 'User not found.';
+      }
+    }
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+</head>
+<body style="background-image: url('https://wallpaperaccess.com/full/5202059.jpg'); background-size: cover;">
+  <!-- Your HTML content goes here -->
+</body>
+</html>
